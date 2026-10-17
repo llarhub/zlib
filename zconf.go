@@ -2,21 +2,32 @@
 
 package zlib
 
-import "github.com/goplus/lib/c"
+import (
+	"github.com/goplus/lib/c"
+	"unsafe"
+)
 
 const MAX_MEM_LEVEL = 9
+
+// 32K LZ77 window
 const MAX_WBITS = 15
 
 type SizeT = c.SizeT
+
+// 8 bits
 type Byte = uint8
+
+// 16 bits or more
 type UInt = c.Uint
+
+// 32 bits or more
 type ULong = c.Ulong
 type Bytef = Byte
 type Charf = c.Char
 type Intf = c.Int
 type UIntf = UInt
 type ULongf = ULong
-type Voidpc uintptr
-type Voidpf uintptr
-type Voidp uintptr
+type Voidpc = unsafe.Pointer
+type Voidpf = unsafe.Pointer
+type Voidp = unsafe.Pointer
 type CrcT = c.Uint

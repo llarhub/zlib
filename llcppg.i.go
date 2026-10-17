@@ -2,4 +2,4 @@
 
 package zlib
 
-const LLGoPackage = "link: $(pkg-config --libs zlib);"
+const LLGoPackage = "link: $(pkg-config --libs zlib); -lz"

@@ -8,83 +8,72 @@ import (
 	"unsafe"
 )
 
-const VERSION = "1.3.2"
-const VERNUM = 4896
-const VER_MAJOR = 1
-const VER_MINOR = 3
-const VER_REVISION = 2
-const VER_SUBREVISION = 0
-const NO_FLUSH = 0
-const PARTIAL_FLUSH = 1
-const SYNC_FLUSH = 2
-const FULL_FLUSH = 3
-const FINISH = 4
-const BLOCK = 5
-const TREES = 6
-const OK = 0
-const STREAM_END = 1
-const NEED_DICT = 2
-const ERRNO = -1
-const STREAM_ERROR = -2
-const DATA_ERROR = -3
-const MEM_ERROR = -4
-const BUF_ERROR = -5
-const VERSION_ERROR = -6
-const NO_COMPRESSION = 0
-const BEST_SPEED = 1
-const BEST_COMPRESSION = 9
-const DEFAULT_COMPRESSION = -1
-const FILTERED = 1
-const HUFFMAN_ONLY = 2
-const RLE = 3
-const FIXED = 4
-const DEFAULT_STRATEGY = 0
-const BINARY = 0
-const TEXT = 1
-const ASCII = 1
-const UNKNOWN = 2
+const (
+	VERSION         = "1.3.2"
+	VERNUM          = 4896
+	VER_MAJOR       = 1
+	VER_MINOR       = 3
+	VER_REVISION    = 2
+	VER_SUBREVISION = 0
+)
+
+// Allowed flush values; see deflate() and inflate() below for details
+const (
+	NO_FLUSH      = 0
+	PARTIAL_FLUSH = 1
+	SYNC_FLUSH    = 2
+	FULL_FLUSH    = 3
+	FINISH        = 4
+	BLOCK         = 5
+	TREES         = 6
+)
+
+// Return codes for the compression/decompression functions. Negative values
+// are errors, positive values are used for special but normal events.
+const (
+	OK            = 0
+	STREAM_END    = 1
+	NEED_DICT     = 2
+	ERRNO         = -1
+	STREAM_ERROR  = -2
+	DATA_ERROR    = -3
+	MEM_ERROR     = -4
+	BUF_ERROR     = -5
+	VERSION_ERROR = -6
+)
+
+// compression levels
+const (
+	NO_COMPRESSION      = 0
+	BEST_SPEED          = 1
+	BEST_COMPRESSION    = 9
+	DEFAULT_COMPRESSION = -1
+)
+
+// compression strategy; see deflateInit2() below for details
+const (
+	FILTERED         = 1
+	HUFFMAN_ONLY     = 2
+	RLE              = 3
+	FIXED            = 4
+	DEFAULT_STRATEGY = 0
+)
+
+// Possible values of the data_type field for deflate()
+const (
+	BINARY = 0
+	TEXT   = 1
+	// for compatibility with 1.2.2 and earlier
+	ASCII   = 1
+	UNKNOWN = 2
+)
+
+// The deflate compression method (the only one supported in this version)
 const DEFLATED = 8
+
+// for initializing zalloc, zfree, opaque
 const NULL = 0
 
-// The 'zlib' compression library provides in-memory compression and
-// decompression functions, including integrity checks of the uncompressed data.
-// This version of the library supports only one compression method (deflation)
-// but other algorithms will be added later and will have the same stream
-// interface.
-//
-// Compression can be done in a single step if the buffers are large enough,
-// or can be done by repeated calls of the compression function.  In the latter
-// case, the application must provide more input and/or consume the output
-// (providing more output space) before each call.
-//
-// The compressed data format used by default by the in-memory functions is
-// the zlib format, which is a zlib wrapper documented in RFC 1950, wrapped
-// around a deflate stream, which is itself documented in RFC 1951.
-//
-// The library also supports reading and writing files in gzip (.gz) format
-// with an interface similar to that of stdio using the functions that start
-// with "gz".  The gzip format is different from the zlib format.  gzip is a
-// gzip wrapper, documented in RFC 1952, wrapped around a deflate stream.
-//
-// This library can optionally read and write gzip and raw deflate streams in
-// memory as well.
-//
-// The zlib format was designed to be compact and fast for use in memory
-// and on communications channels.  The gzip format was designed for single-
-// file compression on file systems, has a larger header than zlib to maintain
-// directory information, and uses a different, slower check method than zlib.
-//
-// The library does not install any signal handler.  The decoder checks
-// the consistency of the compressed data, so the library should never crash
-// even in the case of corrupted input.
-//
-// llgo:type C
-type AllocFunc = func(_llcppg_param1 Voidpf, _llcppg_param2 UInt, _llcppg_param3 UInt) Voidpf
-
-// llgo:type C
-type FreeFunc = func(_llcppg_param1 Voidpf, _llcppg_param2 Voidpf)
-type InternalState struct {
-}
 type StreamS struct {
 	NextIn   *Bytef
 	AvailIn  UInt
@@ -101,8 +90,6 @@ type StreamS struct {
 	Adler    ULong
 	Reserved ULong
 }
-type Stream = StreamS
-type Streamp = *Stream
 
 // gzip header information passed to and from zlib routines.  See RFC 1952
 // for more details on the meanings of these fields.
@@ -122,37 +109,6 @@ type GzHeaderS struct {
 	Done     c.Int
 }
 
-// gzip header information passed to and from zlib routines.  See RFC 1952
-// for more details on the meanings of these fields.
-type GzHeader = GzHeaderS
-type GzHeaderp = *GzHeader
-
-// ZEXTERN int ZEXPORT inflateBackInit(z_streamp strm, int windowBits,
-// unsigned char FAR *window);
-//
-// Initialize the internal stream state for decompression using inflateBack()
-// calls.  The fields zalloc, zfree and opaque in strm must be initialized
-// before the call.  If zalloc and zfree are Z_NULL, then the default library-
-// derived memory allocation routines are used.  windowBits is the base two
-// logarithm of the window size, in the range 8..15.  window is a caller
-// supplied buffer of that size.  Except for special applications where it is
-// assured that deflate was used with small window sizes, windowBits must be 15
-// and a 32K byte window must be supplied to be able to decompress general
-// deflate streams.
-//
-// See inflateBack() for the usage of these routines.
-//
-// inflateBackInit will return Z_OK on success, Z_STREAM_ERROR if any of
-// the parameters are invalid, Z_MEM_ERROR if the internal state could not be
-// allocated, or Z_VERSION_ERROR if the version of the library does not match
-// the version of the header file.
-//
-// llgo:type C
-type InFunc = func(_llcppg_param1 unsafe.Pointer, _llcppg_param2 **uint8) c.Uint
-
-// llgo:type C
-type OutFunc = func(_llcppg_param1 unsafe.Pointer, _llcppg_param2 *uint8, _llcppg_param3 c.Uint) c.Int
-
 // gzgetc() macro and its supporting function and exposed data structure.  Note
 // that the real internal state is much larger than the exposed structure.
 // This abbreviated structure exposes just enough for the gzgetc() macro.  The
@@ -164,40 +120,38 @@ type GzFileS struct {
 	Next *uint8
 	Pos  os.OffT
 }
+type InternalState struct {
+}
 
-// This library supports reading and writing files in gzip (.gz) format with
-// an interface similar to that of stdio, using the functions that start with
-// "gz".  The gzip format is different from the zlib format.  gzip is a gzip
-// wrapper, documented in RFC 1952, wrapped around a deflate stream.
+// llgo:type C
+type AllocFunc = func(_llcppg_param1 Voidpf, _llcppg_param2 UInt, _llcppg_param3 UInt) Voidpf
+
+// llgo:type C
+type FreeFunc = func(_llcppg_param1 Voidpf, _llcppg_param2 Voidpf)
+type Stream = StreamS
+type Streamp = *Stream
+
+// gzip header information passed to and from zlib routines.  See RFC 1952
+// for more details on the meanings of these fields.
+type GzHeader = GzHeaderS
+type GzHeaderp = *GzHeader
+
+// llgo:type C
+type InFunc = func(_llcppg_param1 unsafe.Pointer, _llcppg_param2 **uint8) c.Uint
+
+// llgo:type C
+type OutFunc = func(_llcppg_param1 unsafe.Pointer, _llcppg_param2 *uint8, _llcppg_param3 c.Uint) c.Int
+
+// semi-opaque gzip file descriptor
 type GzFile = *GzFileS
 
-// basic functions
+// The application can compare zlibVersion and ZLIB_VERSION for consistency.
+// If the first character differs, the library code actually used is not
+// compatible with the zlib.h header file used by the application.  This check
+// is automatically made by deflateInit and inflateInit.
 //
 //go:linkname Version C.zlibVersion
 func Version() *c.Char
-
-// ZEXTERN int ZEXPORT deflateInit(z_streamp strm, int level);
-//
-// Initializes the internal stream state for compression.  The fields
-// zalloc, zfree and opaque must be initialized before by the caller.  If
-// zalloc and zfree are set to Z_NULL, deflateInit updates them to use default
-// allocation functions.  total_in, total_out, adler, and msg are initialized.
-//
-// The compression level must be Z_DEFAULT_COMPRESSION, or between 0 and 9:
-// 1 gives best speed, 9 gives best compression, 0 gives no compression at all
-// (the input data is simply copied a block at a time).  Z_DEFAULT_COMPRESSION
-// requests a default compromise between speed and compression (currently
-// equivalent to level 6).
-//
-// deflateInit returns Z_OK if success, Z_MEM_ERROR if there was not enough
-// memory, Z_STREAM_ERROR if level is not a valid compression level, or
-// Z_VERSION_ERROR if the zlib library version (zlib_version) is incompatible
-// with the version assumed by the caller (ZLIB_VERSION).  msg is set to null
-// if there is no error message.  deflateInit does not perform any compression:
-// this will be done by deflate().
-//
-//go:linkname Deflate C.deflate
-func Deflate(strm Streamp, flush c.Int) c.Int
 
 // deflate compresses as much data as possible, and stops when the input
 // buffer becomes empty or the output buffer becomes full.  It may introduce
@@ -308,32 +262,25 @@ func Deflate(strm Streamp, flush c.Int) c.Int
 // deflate() can be called again with more input and more output space to
 // continue compressing.
 //
-//go:linkname DeflateEnd C.deflateEnd
-func DeflateEnd(strm Streamp) c.Int
+// llgo:link Streamp.Deflate C.deflate
+func (self Streamp) Deflate(flush c.Int) c.Int {
+	return 0
+}
 
-// ZEXTERN int ZEXPORT inflateInit(z_streamp strm);
+// All dynamically allocated data structures for this stream are freed.
+// This function discards any unprocessed input and does not flush any pending
+// output.
 //
-// Initializes the internal stream state for decompression.  The fields
-// next_in, avail_in, zalloc, zfree and opaque must be initialized before by
-// the caller.  In the current version of inflate, the provided input is not
-// read or consumed.  The allocation of a sliding window will be deferred to
-// the first call of inflate (if the decompression does not complete on the
-// first call).  If zalloc and zfree are set to Z_NULL, inflateInit updates
-// them to use default allocation functions.  total_in, total_out, adler, and
-// msg are initialized.
+// deflateEnd returns Z_OK if success, Z_STREAM_ERROR if the
+// stream state was inconsistent, Z_DATA_ERROR if the stream was freed
+// prematurely (some input or output was discarded).  In the error case, msg
+// may be set but then points to a static string (which must not be
+// deallocated).
 //
-// inflateInit returns Z_OK if success, Z_MEM_ERROR if there was not enough
-// memory, Z_VERSION_ERROR if the zlib library version is incompatible with the
-// version assumed by the caller, or Z_STREAM_ERROR if the parameters are
-// invalid, such as a null pointer to the structure.  msg is set to null if
-// there is no error message.  inflateInit does not perform any decompression.
-// Actual decompression will be done by inflate().  So next_in, and avail_in,
-// next_out, and avail_out are unused and unchanged.  The current
-// implementation of inflateInit() does not process any header information --
-// that is deferred until inflate() is called.
-//
-//go:linkname Inflate C.inflate
-func Inflate(strm Streamp, flush c.Int) c.Int
+// llgo:link Streamp.DeflateEnd C.deflateEnd
+func (self Streamp) DeflateEnd() c.Int {
+	return 0
+}
 
 // inflate decompresses as much data as possible, and stops when the input
 // buffer becomes empty or the output buffer becomes full.  It may introduce
@@ -451,85 +398,22 @@ func Inflate(strm Streamp, flush c.Int) c.Int
 // then call inflateSync() to look for a good compression block if a partial
 // recovery of the data is to be attempted.
 //
-//go:linkname InflateEnd C.inflateEnd
-func InflateEnd(strm Streamp) c.Int
+// llgo:link Streamp.Inflate C.inflate
+func (self Streamp) Inflate(flush c.Int) c.Int {
+	return 0
+}
 
-// ZEXTERN int ZEXPORT deflateInit2(z_streamp strm,
-// int level,
-// int method,
-// int windowBits,
-// int memLevel,
-// int strategy);
+// All dynamically allocated data structures for this stream are freed.
+// This function discards any unprocessed input and does not flush any pending
+// output.
 //
-// This is another version of deflateInit with more compression options.  The
-// fields zalloc, zfree and opaque must be initialized before by the caller.
+// inflateEnd returns Z_OK if success, or Z_STREAM_ERROR if the stream state
+// was inconsistent.
 //
-// The method parameter is the compression method.  It must be Z_DEFLATED in
-// this version of the library.
-//
-// The windowBits parameter is the base two logarithm of the window size
-// (the size of the history buffer).  It should be in the range 8..15 for this
-// version of the library.  Larger values of this parameter result in better
-// compression at the expense of memory usage.  The default value is 15 if
-// deflateInit is used instead.
-//
-// For the current implementation of deflate(), a windowBits value of 8 (a
-// window size of 256 bytes) is not supported.  As a result, a request for 8
-// will result in 9 (a 512-byte window).  In that case, providing 8 to
-// inflateInit2() will result in an error when the zlib header with 9 is
-// checked against the initialization of inflate().  The remedy is to not use 8
-// with deflateInit2() with this initialization, or at least in that case use 9
-// with inflateInit2().
-//
-// windowBits can also be -8..-15 for raw deflate.  In this case, -windowBits
-// determines the window size.  deflate() will then generate raw deflate data
-// with no zlib header or trailer, and will not compute a check value.
-//
-// windowBits can also be greater than 15 for optional gzip encoding.  Add
-// 16 to windowBits to write a simple gzip header and trailer around the
-// compressed data instead of a zlib wrapper.  The gzip header will have no
-// file name, no extra data, no comment, no modification time (set to zero), no
-// header crc, and the operating system will be set to the appropriate value,
-// if the operating system was determined at compile time.  If a gzip stream is
-// being written, strm->adler is a CRC-32 instead of an Adler-32.
-//
-// For raw deflate or gzip encoding, a request for a 256-byte window is
-// rejected as invalid, since only the zlib header provides a means of
-// transmitting the window size to the decompressor.
-//
-// The memLevel parameter specifies how much memory should be allocated
-// for the internal compression state.  memLevel=1 uses minimum memory but is
-// slow and reduces compression ratio; memLevel=9 uses maximum memory for
-// optimal speed.  The default value is 8.  See zconf.h for total memory usage
-// as a function of windowBits and memLevel.
-//
-// The strategy parameter is used to tune the compression algorithm.  Use the
-// value Z_DEFAULT_STRATEGY for normal data, Z_FILTERED for data produced by a
-// filter (or predictor), Z_RLE to limit match distances to one (run-length
-// encoding), or Z_HUFFMAN_ONLY to force Huffman encoding only (no string
-// matching).  Filtered data consists mostly of small values with a somewhat
-// random distribution, as produced by the PNG filters.  In this case, the
-// compression algorithm is tuned to compress them better.  The effect of
-// Z_FILTERED is to force more Huffman coding and less string matching than the
-// default; it is intermediate between Z_DEFAULT_STRATEGY and Z_HUFFMAN_ONLY.
-// Z_RLE is almost as fast as Z_HUFFMAN_ONLY, but should give better
-// compression for PNG image data than Huffman only.  The degree of string
-// matching from most to none is: Z_DEFAULT_STRATEGY, Z_FILTERED, Z_RLE, then
-// Z_HUFFMAN_ONLY. The strategy parameter affects the compression ratio but
-// never the correctness of the compressed output, even if it is not set
-// optimally for the given data.  Z_FIXED uses the default string matching, but
-// prevents the use of dynamic Huffman codes, allowing for a simpler decoder
-// for special applications.
-//
-// deflateInit2 returns Z_OK if success, Z_MEM_ERROR if there was not enough
-// memory, Z_STREAM_ERROR if any parameter is invalid (such as an invalid
-// method), or Z_VERSION_ERROR if the zlib library version (zlib_version) is
-// incompatible with the version assumed by the caller (ZLIB_VERSION).  msg is
-// set to null if there is no error message.  deflateInit2 does not perform any
-// compression: this will be done by deflate().
-//
-//go:linkname DeflateSetDictionary C.deflateSetDictionary
-func DeflateSetDictionary(strm Streamp, dictionary *Bytef, dictLength UInt) c.Int
+// llgo:link Streamp.InflateEnd C.inflateEnd
+func (self Streamp) InflateEnd() c.Int {
+	return 0
+}
 
 // Initializes the compression dictionary from the given byte sequence
 // without producing any compressed output.  When using the zlib format, this
@@ -570,8 +454,10 @@ func DeflateSetDictionary(strm Streamp, dictionary *Bytef, dictLength UInt) c.In
 // or if not at a block boundary for raw deflate).  deflateSetDictionary does
 // not perform any compression: this will be done by deflate().
 //
-//go:linkname DeflateGetDictionary C.deflateGetDictionary
-func DeflateGetDictionary(strm Streamp, dictionary *Bytef, dictLength *UInt) c.Int
+// llgo:link Streamp.DeflateSetDictionary C.deflateSetDictionary
+func (self Streamp) DeflateSetDictionary(dictionary *Bytef, dictLength UInt) c.Int {
+	return 0
+}
 
 // Returns the sliding dictionary being maintained by deflate.  dictLength is
 // set to the number of bytes in the dictionary, and that many bytes are copied
@@ -590,8 +476,10 @@ func DeflateGetDictionary(strm Streamp, dictionary *Bytef, dictLength *UInt) c.I
 // deflateGetDictionary returns Z_OK on success, or Z_STREAM_ERROR if the
 // stream state is inconsistent.
 //
-//go:linkname DeflateCopy C.deflateCopy
-func DeflateCopy(dest Streamp, source Streamp) c.Int
+// llgo:link Streamp.DeflateGetDictionary C.deflateGetDictionary
+func (self Streamp) DeflateGetDictionary(dictionary *Bytef, dictLength *UInt) c.Int {
+	return 0
+}
 
 // Sets the destination stream as a complete copy of the source stream.
 //
@@ -607,8 +495,8 @@ func DeflateCopy(dest Streamp, source Streamp) c.Int
 // (such as zalloc being Z_NULL).  msg is left unchanged in both source and
 // destination.
 //
-//go:linkname DeflateReset C.deflateReset
-func DeflateReset(strm Streamp) c.Int
+//go:linkname DeflateCopy C.deflateCopy
+func DeflateCopy(dest Streamp, source Streamp) c.Int
 
 // This function is equivalent to deflateEnd followed by deflateInit, but
 // does not free and reallocate the internal compression state.  The stream
@@ -618,8 +506,10 @@ func DeflateReset(strm Streamp) c.Int
 // deflateReset returns Z_OK if success, or Z_STREAM_ERROR if the source
 // stream state was inconsistent (such as zalloc or state being Z_NULL).
 //
-//go:linkname DeflateParams C.deflateParams
-func DeflateParams(strm Streamp, level c.Int, strategy c.Int) c.Int
+// llgo:link Streamp.DeflateReset C.deflateReset
+func (self Streamp) DeflateReset() c.Int {
+	return 0
+}
 
 // Dynamically update the compression level and compression strategy.  The
 // interpretation of level and strategy is as in deflateInit2().  This can be
@@ -654,8 +544,10 @@ func DeflateParams(strm Streamp, level c.Int, strategy c.Int) c.Int
 // value of Z_BUF_ERROR is not fatal, in which case deflateParams() can be
 // retried with more output space.
 //
-//go:linkname DeflateTune C.deflateTune
-func DeflateTune(strm Streamp, good_length c.Int, max_lazy c.Int, nice_length c.Int, max_chain c.Int) c.Int
+// llgo:link Streamp.DeflateParams C.deflateParams
+func (self Streamp) DeflateParams(level c.Int, strategy c.Int) c.Int {
+	return 0
+}
 
 // Fine tune deflate's internal compression parameters.  This should only be
 // used by someone who understands the algorithm used by zlib's deflate for
@@ -667,11 +559,15 @@ func DeflateTune(strm Streamp, good_length c.Int, max_lazy c.Int, nice_length c.
 // deflateTune() can be called after deflateInit() or deflateInit2(), and
 // returns Z_OK on success, or Z_STREAM_ERROR for an invalid deflate stream.
 //
-//go:linkname DeflateBound C.deflateBound
-func DeflateBound(strm Streamp, sourceLen ULong) ULong
+// llgo:link Streamp.DeflateTune C.deflateTune
+func (self Streamp) DeflateTune(good_length c.Int, max_lazy c.Int, nice_length c.Int, max_chain c.Int) c.Int {
+	return 0
+}
 
-//go:linkname DeflateBoundZ C.deflateBound_z
-func DeflateBoundZ(strm Streamp, sourceLen SizeT) SizeT
+// llgo:link Streamp.DeflateBound C.deflateBound
+func (self Streamp) DeflateBound(sourceLen ULong) ULong {
+	return 0
+}
 
 // deflateBound() returns an upper bound on the compressed size after
 // deflation of sourceLen bytes.  It must be called after deflateInit() or
@@ -687,8 +583,10 @@ func DeflateBoundZ(strm Streamp, sourceLen SizeT) SizeT
 // delfateBound_z() is the same, but takes and returns a size_t length.  Note
 // that a long is 32 bits on Windows.
 //
-//go:linkname DeflatePending C.deflatePending
-func DeflatePending(strm Streamp, pending *c.Uint, bits *c.Int) c.Int
+// llgo:link Streamp.DeflateBoundZ C.deflateBound_z
+func (self Streamp) DeflateBoundZ(sourceLen SizeT) SizeT {
+	return 0
+}
 
 // deflatePending() returns the number of bytes and bits of output that have
 // been generated, but not yet provided in the available output.  The bytes not
@@ -703,8 +601,10 @@ func DeflatePending(strm Streamp, pending *c.Uint, bits *c.Int) c.Int
 // that case Z_BUF_ERROR is returned and *pending is set to the maximum value
 // of an unsigned.
 //
-//go:linkname DeflateUsed C.deflateUsed
-func DeflateUsed(strm Streamp, bits *c.Int) c.Int
+// llgo:link Streamp.DeflatePending C.deflatePending
+func (self Streamp) DeflatePending(pending *c.Uint, bits *c.Int) c.Int {
+	return 0
+}
 
 // deflateUsed() returns in *bits the most recent number of deflate bits used
 // in the last byte when flushing to a byte boundary. The result is in 1..8, or
@@ -714,8 +614,10 @@ func DeflateUsed(strm Streamp, bits *c.Int) c.Int
 // deflateUsed returns Z_OK if success, or Z_STREAM_ERROR if the source
 // stream state was inconsistent.
 //
-//go:linkname DeflatePrime C.deflatePrime
-func DeflatePrime(strm Streamp, bits c.Int, value c.Int) c.Int
+// llgo:link Streamp.DeflateUsed C.deflateUsed
+func (self Streamp) DeflateUsed(bits *c.Int) c.Int {
+	return 0
+}
 
 // deflatePrime() inserts bits in the deflate output stream.  The intent
 // is that this function is used to start off the deflate output with the bits
@@ -729,64 +631,36 @@ func DeflatePrime(strm Streamp, bits c.Int, value c.Int) c.Int
 // room in the internal buffer to insert the bits, or Z_STREAM_ERROR if the
 // source stream state was inconsistent.
 //
-//go:linkname DeflateSetHeader C.deflateSetHeader
-func DeflateSetHeader(strm Streamp, head GzHeaderp) c.Int
+// llgo:link Streamp.DeflatePrime C.deflatePrime
+func (self Streamp) DeflatePrime(bits c.Int, value c.Int) c.Int {
+	return 0
+}
 
-// ZEXTERN int ZEXPORT inflateInit2(z_streamp strm,
-// int windowBits);
+// deflateSetHeader() provides gzip header information for when a gzip
+// stream is requested by deflateInit2().  deflateSetHeader() may be called
+// after deflateInit2() or deflateReset() and before the first call of
+// deflate().  The text, time, os, extra field, name, and comment information
+// in the provided gz_header structure are written to the gzip header (xflag is
+// ignored -- the extra flags are set according to the compression level).  The
+// caller must assure that, if not Z_NULL, name and comment are terminated with
+// a zero byte, and that if extra is not Z_NULL, that extra_len bytes are
+// available there.  If hcrc is true, a gzip header crc is included.  Note that
+// the current versions of the command-line version of gzip (up through version
+// 1.3.x) do not support header crc's, and will report that it is a "multi-part
+// gzip file" and give up.
 //
-// This is another version of inflateInit with an extra parameter.  The
-// fields next_in, avail_in, zalloc, zfree and opaque must be initialized
-// before by the caller.
+// If deflateSetHeader is not used, the default gzip header has text false,
+// the time set to zero, and os set to the current operating system, with no
+// extra, name, or comment fields.  The gzip header is returned to the default
+// state by deflateReset().
 //
-// The windowBits parameter is the base two logarithm of the maximum window
-// size (the size of the history buffer).  It should be in the range 8..15 for
-// this version of the library.  The default value is 15 if inflateInit is used
-// instead.  windowBits must be greater than or equal to the windowBits value
-// provided to deflateInit2() while compressing, or it must be equal to 15 if
-// deflateInit2() was not used.  If a compressed stream with a larger window
-// size is given as input, inflate() will return with the error code
-// Z_DATA_ERROR instead of trying to allocate a larger window.
+// deflateSetHeader returns Z_OK if success, or Z_STREAM_ERROR if the source
+// stream state was inconsistent.
 //
-// windowBits can also be zero to request that inflate use the window size in
-// the zlib header of the compressed stream.
-//
-// windowBits can also be -8..-15 for raw inflate.  In this case, -windowBits
-// determines the window size.  inflate() will then process raw deflate data,
-// not looking for a zlib or gzip header, not generating a check value, and not
-// looking for any check values for comparison at the end of the stream.  This
-// is for use with other formats that use the deflate compressed data format
-// such as zip.  Those formats provide their own check values.  If a custom
-// format is developed using the raw deflate format for compressed data, it is
-// recommended that a check value such as an Adler-32 or a CRC-32 be applied to
-// the uncompressed data as is done in the zlib, gzip, and zip formats.  For
-// most applications, the zlib format should be used as is.  Note that comments
-// above on the use in deflateInit2() applies to the magnitude of windowBits.
-//
-// windowBits can also be greater than 15 for optional gzip decoding.  Add
-// 32 to windowBits to enable zlib and gzip decoding with automatic header
-// detection, or add 16 to decode only the gzip format (the zlib format will
-// return a Z_DATA_ERROR).  If a gzip stream is being decoded, strm->adler is a
-// CRC-32 instead of an Adler-32.  Unlike the gunzip utility and gzread() (see
-// below), inflate() will *not* automatically decode concatenated gzip members.
-// inflate() will return Z_STREAM_END at the end of the gzip member.  The state
-// would need to be reset to continue decoding a subsequent gzip member.  This
-// must* be done if there is more data after a gzip member, in order for the
-// decompression to be compliant with the gzip standard (RFC 1952).
-//
-// inflateInit2 returns Z_OK if success, Z_MEM_ERROR if there was not enough
-// memory, Z_VERSION_ERROR if the zlib library version is incompatible with the
-// version assumed by the caller, or Z_STREAM_ERROR if the parameters are
-// invalid, such as a null pointer to the structure.  msg is set to null if
-// there is no error message.  inflateInit2 does not perform any decompression
-// apart from possibly reading the zlib header if present: actual decompression
-// will be done by inflate().  (So next_in and avail_in may be modified, but
-// next_out and avail_out are unused and unchanged.) The current implementation
-// of inflateInit2() does not process any header information -- that is
-// deferred until inflate() is called.
-//
-//go:linkname InflateSetDictionary C.inflateSetDictionary
-func InflateSetDictionary(strm Streamp, dictionary *Bytef, dictLength UInt) c.Int
+// llgo:link Streamp.DeflateSetHeader C.deflateSetHeader
+func (self Streamp) DeflateSetHeader(head GzHeaderp) c.Int {
+	return 0
+}
 
 // Initializes the decompression dictionary from the given uncompressed byte
 // sequence.  This function must be called immediately after a call of inflate,
@@ -806,8 +680,10 @@ func InflateSetDictionary(strm Streamp, dictionary *Bytef, dictLength UInt) c.In
 // perform any decompression: this will be done by subsequent calls of
 // inflate().
 //
-//go:linkname InflateGetDictionary C.inflateGetDictionary
-func InflateGetDictionary(strm Streamp, dictionary *Bytef, dictLength *UInt) c.Int
+// llgo:link Streamp.InflateSetDictionary C.inflateSetDictionary
+func (self Streamp) InflateSetDictionary(dictionary *Bytef, dictLength UInt) c.Int {
+	return 0
+}
 
 // Returns the sliding dictionary being maintained by inflate.  dictLength is
 // set to the number of bytes in the dictionary, and that many bytes are copied
@@ -819,8 +695,10 @@ func InflateGetDictionary(strm Streamp, dictionary *Bytef, dictLength *UInt) c.I
 // inflateGetDictionary returns Z_OK on success, or Z_STREAM_ERROR if the
 // stream state is inconsistent.
 //
-//go:linkname InflateSync C.inflateSync
-func InflateSync(strm Streamp) c.Int
+// llgo:link Streamp.InflateGetDictionary C.inflateGetDictionary
+func (self Streamp) InflateGetDictionary(dictionary *Bytef, dictLength *UInt) c.Int {
+	return 0
+}
 
 // Skips invalid compressed data until a possible full flush point (see above
 // for the description of deflate with Z_FULL_FLUSH) can be found, or until all
@@ -838,8 +716,10 @@ func InflateSync(strm Streamp) c.Int
 // the application may repeatedly call inflateSync, providing more input each
 // time, until success or end of the input data.
 //
-//go:linkname InflateCopy C.inflateCopy
-func InflateCopy(dest Streamp, source Streamp) c.Int
+// llgo:link Streamp.InflateSync C.inflateSync
+func (self Streamp) InflateSync() c.Int {
+	return 0
+}
 
 // Sets the destination stream as a complete copy of the source stream.
 //
@@ -853,8 +733,8 @@ func InflateCopy(dest Streamp, source Streamp) c.Int
 // (such as zalloc being Z_NULL).  msg is left unchanged in both source and
 // destination.
 //
-//go:linkname InflateReset C.inflateReset
-func InflateReset(strm Streamp) c.Int
+//go:linkname InflateCopy C.inflateCopy
+func InflateCopy(dest Streamp, source Streamp) c.Int
 
 // This function is equivalent to inflateEnd followed by inflateInit,
 // but does not free and reallocate the internal decompression state.  The
@@ -864,8 +744,10 @@ func InflateReset(strm Streamp) c.Int
 // inflateReset returns Z_OK if success, or Z_STREAM_ERROR if the source
 // stream state was inconsistent (such as zalloc or state being Z_NULL).
 //
-//go:linkname InflateReset2 C.inflateReset2
-func InflateReset2(strm Streamp, windowBits c.Int) c.Int
+// llgo:link Streamp.InflateReset C.inflateReset
+func (self Streamp) InflateReset() c.Int {
+	return 0
+}
 
 // This function is the same as inflateReset, but it also permits changing
 // the wrap and window size requests.  The windowBits parameter is interpreted
@@ -877,8 +759,10 @@ func InflateReset2(strm Streamp, windowBits c.Int) c.Int
 // stream state was inconsistent (such as zalloc or state being Z_NULL), or if
 // the windowBits parameter is invalid.
 //
-//go:linkname InflatePrime C.inflatePrime
-func InflatePrime(strm Streamp, bits c.Int, value c.Int) c.Int
+// llgo:link Streamp.InflateReset2 C.inflateReset2
+func (self Streamp) InflateReset2(windowBits c.Int) c.Int {
+	return 0
+}
 
 // This function inserts bits in the inflate input stream.  The intent is to
 // use inflatePrime() to start inflating at a bit position in the middle of a
@@ -906,8 +790,10 @@ func InflatePrime(strm Streamp, bits c.Int, value c.Int) c.Int
 // number of bits available for insertion.  inflatePrime does not update
 // data_type with the new number of bits in buffer.
 //
-//go:linkname InflateMark C.inflateMark
-func InflateMark(strm Streamp) c.Long
+// llgo:link Streamp.InflatePrime C.inflatePrime
+func (self Streamp) InflatePrime(bits c.Int, value c.Int) c.Int {
+	return 0
+}
 
 // This function returns two values, one in the lower 16 bits of the return
 // value, and the other in the remaining upper bits, obtained by shifting the
@@ -934,11 +820,53 @@ func InflateMark(strm Streamp) c.Long
 // inflateMark returns the value noted above, or -65536 if the provided
 // source stream state was inconsistent.
 //
-//go:linkname InflateGetHeader C.inflateGetHeader
-func InflateGetHeader(strm Streamp, head GzHeaderp) c.Int
+// llgo:link Streamp.InflateMark C.inflateMark
+func (self Streamp) InflateMark() c.Long {
+	return 0
+}
 
-//go:linkname InflateBack C.inflateBack
-func InflateBack(strm Streamp, in InFunc, in_desc unsafe.Pointer, out OutFunc, out_desc unsafe.Pointer) c.Int
+// inflateGetHeader() requests that gzip header information be stored in the
+// provided gz_header structure.  inflateGetHeader() may be called after
+// inflateInit2() or inflateReset(), and before the first call of inflate().
+// As inflate() processes the gzip stream, head->done is zero until the header
+// is completed, at which time head->done is set to one.  If a zlib stream is
+// being decoded, then head->done is set to -1 to indicate that there will be
+// no gzip header information forthcoming.  Note that Z_BLOCK or Z_TREES can be
+// used to force inflate() to return immediately after header processing is
+// complete and before any actual data is decompressed.
+//
+// The text, time, xflags, and os fields are filled in with the gzip header
+// contents.  hcrc is set to true if there is a header CRC.  (The header CRC
+// was valid if done is set to one.)  The extra, name, and comment pointers
+// much each be either Z_NULL or point to space to store that information from
+// the header.  If extra is not Z_NULL, then extra_max contains the maximum
+// number of bytes that can be written to extra.  Once done is true, extra_len
+// contains the actual extra field length, and extra contains the extra field,
+// or that field truncated if extra_max is less than extra_len.  If name is not
+// Z_NULL, then up to name_max characters, including the terminating zero, are
+// written there.  If comment is not Z_NULL, then up to comm_max characters,
+// including the terminating zero, are written there.  The application can tell
+// that the name or comment did not fit in the provided space by the absence of
+// a terminating zero.  If any of extra, name, or comment are not present in
+// the header, then that field's pointer is set to Z_NULL.  This allows the use
+// of deflateSetHeader() with the returned structure to duplicate the header.
+// Note that if those fields initially pointed to allocated memory, then the
+// application will need to save them elsewhere so that they can be eventually
+// freed.
+//
+// If inflateGetHeader is not used, then the header information is simply
+// discarded.  The header is always checked for validity, including the header
+// CRC if present.  inflateReset() will reset the process to discard the header
+// information.  The application would need to call inflateGetHeader() again to
+// retrieve the header from the next gzip stream.
+//
+// inflateGetHeader returns Z_OK if success, or Z_STREAM_ERROR if the source
+// stream state was inconsistent.
+//
+// llgo:link Streamp.InflateGetHeader C.inflateGetHeader
+func (self Streamp) InflateGetHeader(head GzHeaderp) c.Int {
+	return 0
+}
 
 // inflateBack() does a raw inflate with a single call using a call-back
 // interface for input and output.  This is potentially more efficient than
@@ -1005,29 +933,66 @@ func InflateBack(strm Streamp, in InFunc, in_desc unsafe.Pointer, out OutFunc, o
 // assured to be defined if out() returns non-zero.)  Note that inflateBack()
 // cannot return Z_OK.
 //
-//go:linkname InflateBackEnd C.inflateBackEnd
-func InflateBackEnd(strm Streamp) c.Int
+// llgo:link Streamp.InflateBack C.inflateBack
+func (self Streamp) InflateBack(in InFunc, in_desc unsafe.Pointer, out OutFunc, out_desc unsafe.Pointer) c.Int {
+	return 0
+}
 
 // All memory allocated by inflateBackInit() is freed.
 //
 // inflateBackEnd() returns Z_OK on success, or Z_STREAM_ERROR if the stream
 // state was inconsistent.
 //
+// llgo:link Streamp.InflateBackEnd C.inflateBackEnd
+func (self Streamp) InflateBackEnd() c.Int {
+	return 0
+}
+
+// Return flags indicating compile-time options.
+//
+// Type sizes, two bits each, 00 = 16 bits, 01 = 32, 10 = 64, 11 = other:
+// 1.0: size of uInt
+// 3.2: size of uLong
+// 5.4: size of voidpf (pointer)
+// 7.6: size of z_off_t
+//
+// Compiler, assembler, and debug options:
+// 8: ZLIB_DEBUG
+// 9: ASMV or ASMINF -- use ASM code
+// 10: ZLIB_WINAPI -- exported functions use the WINAPI calling convention
+// 11: 0 (reserved)
+//
+// One-time table building (smaller code, but not thread-safe if true):
+// 12: BUILDFIXED -- build static block decoding tables when needed
+// 13: DYNAMIC_CRC_TABLE -- build CRC calculation tables when needed
+// 14,15: 0 (reserved)
+//
+// Library content (indicates missing functionality):
+// 16: NO_GZCOMPRESS -- gz* functions cannot compress (to avoid linking
+// deflate code when not needed)
+// 17: NO_GZIP -- deflate can't write gzip streams, and inflate can't detect
+// and decode gzip streams (to avoid linking crc code)
+// 18-19: 0 (reserved)
+//
+// Operation variations (changes in library functionality):
+// 20: PKZIP_BUG_WORKAROUND -- slightly more permissive inflate
+// 21: FASTEST -- deflate algorithm with only one, lowest compression level
+// 22,23: 0 (reserved)
+//
+// The sprintf variant used by gzprintf (all zeros is best):
+// 24: 0 = vs*, 1 = s* -- 1 means limited to 20 arguments after the format
+// 25: 0 = *nprintf, 1 = *printf -- 1 means gzprintf() is not secure!
+// 26: 0 = returns value, 1 = void -- 1 means inferred string length returned
+// 27: 0 = gzprintf() present, 1 = not -- 1 means gzprintf() returns an error
+//
+// Remainder:
+// 28-31: 0 (reserved)
+//
 //go:linkname CompileFlags C.zlibCompileFlags
 func CompileFlags() ULong
 
-// The following utility functions are implemented on top of the basic
-// stream-oriented functions.  To simplify the interface, some default options
-// are assumed (compression level and memory usage, standard memory allocation
-// functions).  The source code of these utility functions can be modified if
-// you need special options.  The _z versions of the functions use the size_t
-// type for lengths.  Note that a long is 32 bits on Windows.
-//
 //go:linkname Compress C.compress
 func Compress(dest *Bytef, destLen *ULongf, source *Bytef, sourceLen ULong) c.Int
-
-//go:linkname CompressZ C.compress_z
-func CompressZ(dest *Bytef, destLen *SizeT, source *Bytef, sourceLen SizeT) c.Int
 
 // Compresses the source buffer into the destination buffer.  sourceLen is
 // the byte length of the source buffer.  Upon entry, destLen is the total size
@@ -1040,11 +1005,11 @@ func CompressZ(dest *Bytef, destLen *SizeT, source *Bytef, sourceLen SizeT) c.In
 // enough memory, Z_BUF_ERROR if there was not enough room in the output
 // buffer.
 //
+//go:linkname CompressZ C.compress_z
+func CompressZ(dest *Bytef, destLen *SizeT, source *Bytef, sourceLen SizeT) c.Int
+
 //go:linkname Compress2 C.compress2
 func Compress2(dest *Bytef, destLen *ULongf, source *Bytef, sourceLen ULong, level c.Int) c.Int
-
-//go:linkname Compress2Z C.compress2_z
-func Compress2Z(dest *Bytef, destLen *SizeT, source *Bytef, sourceLen SizeT, level c.Int) c.Int
 
 // Compresses the source buffer into the destination buffer.  The level
 // parameter has the same meaning as in deflateInit.  sourceLen is the byte
@@ -1057,21 +1022,21 @@ func Compress2Z(dest *Bytef, destLen *SizeT, source *Bytef, sourceLen SizeT, lev
 // memory, Z_BUF_ERROR if there was not enough room in the output buffer,
 // Z_STREAM_ERROR if the level parameter is invalid.
 //
+//go:linkname Compress2Z C.compress2_z
+func Compress2Z(dest *Bytef, destLen *SizeT, source *Bytef, sourceLen SizeT, level c.Int) c.Int
+
 //go:linkname CompressBound C.compressBound
 func CompressBound(sourceLen ULong) ULong
-
-//go:linkname CompressBoundZ C.compressBound_z
-func CompressBoundZ(sourceLen SizeT) SizeT
 
 // compressBound() returns an upper bound on the compressed size after
 // compress() or compress2() on sourceLen bytes.  It would be used before a
 // compress() or compress2() call to allocate the destination buffer.
 //
+//go:linkname CompressBoundZ C.compressBound_z
+func CompressBoundZ(sourceLen SizeT) SizeT
+
 //go:linkname Uncompress C.uncompress
 func Uncompress(dest *Bytef, destLen *ULongf, source *Bytef, sourceLen ULong) c.Int
-
-//go:linkname UncompressZ C.uncompress_z
-func UncompressZ(dest *Bytef, destLen *SizeT, source *Bytef, sourceLen SizeT) c.Int
 
 // Decompresses the source buffer into the destination buffer.  sourceLen is
 // the byte length of the source buffer.  On entry, *destLen is the total size
@@ -1087,60 +1052,18 @@ func UncompressZ(dest *Bytef, destLen *SizeT, source *Bytef, sourceLen SizeT) c.
 // the case where there is not enough room, uncompress() will fill the output
 // buffer with the uncompressed data up to that point.
 //
+//go:linkname UncompressZ C.uncompress_z
+func UncompressZ(dest *Bytef, destLen *SizeT, source *Bytef, sourceLen SizeT) c.Int
+
 //go:linkname Uncompress2 C.uncompress2
 func Uncompress2(dest *Bytef, destLen *ULongf, source *Bytef, sourceLen *ULong) c.Int
 
+// Same as uncompress, except that sourceLen is a pointer, where the
+// length of the source is *sourceLen.  On return, *sourceLen is the number of
+// source bytes consumed.
+//
 //go:linkname Uncompress2Z C.uncompress2_z
 func Uncompress2Z(dest *Bytef, destLen *SizeT, source *Bytef, sourceLen *SizeT) c.Int
-
-// ZEXTERN gzFile ZEXPORT gzopen(const char *path, const char *mode);
-//
-// Open the gzip (.gz) file at path for reading and decompressing, or
-// compressing and writing.  The mode parameter is as in fopen ("rb" or "wb")
-// but can also include a compression level ("wb9") or a strategy: 'f' for
-// filtered data as in "wb6f", 'h' for Huffman-only compression as in "wb1h",
-// 'R' for run-length encoding as in "wb1R", or 'F' for fixed code compression
-// as in "wb9F".  (See the description of deflateInit2 for more information
-// about the strategy parameter.)  'T' will request transparent writing or
-// appending with no compression and not using the gzip format. 'T' cannot be
-// used to force transparent reading. Transparent reading is automatically
-// performed if there is no gzip header at the start. Transparent reading can
-// be disabled with the 'G' option, which will instead return an error if there
-// is no gzip header. 'N' will open the file in non-blocking mode.
-//
-// 'a' can be used instead of 'w' to request that the gzip stream that will
-// be written be appended to the file.  '+' will result in an error, since
-// reading and writing to the same gzip file is not supported.  The addition of
-// 'x' when writing will create the file exclusively, which fails if the file
-// already exists.  On systems that support it, the addition of 'e' when
-// reading or writing will set the flag to close the file on an execve() call.
-//
-// These functions, as well as gzip, will read and decode a sequence of gzip
-// streams in a file.  The append function of gzopen() can be used to create
-// such a file.  (Also see gzflush() for another way to do this.)  When
-// appending, gzopen does not test whether the file begins with a gzip stream,
-// nor does it look for the end of the gzip streams to begin appending.  gzopen
-// will simply append a gzip stream to the existing file.
-//
-// gzopen can be used to read a file which is not in gzip format; in this
-// case gzread will directly read from the file without decompression.  When
-// reading, this will be detected automatically by looking for the magic two-
-// byte gzip header.
-//
-// gzopen returns NULL if the file could not be opened, if there was
-// insufficient memory to allocate the gzFile state, or if an invalid mode was
-// specified (an 'r', 'w', or 'a' was not provided, or '+' was provided).
-// errno can be checked to determine if the reason gzopen failed was that the
-// file could not be opened. Note that if 'N' is in mode for non-blocking, the
-// open() itself can fail in order to not block. In that case gzopen() will
-// return NULL and errno will be EAGAIN or ENONBLOCK. The call to gzopen() can
-// then be re-tried. If the application would like to block on opening the
-// file, then it can use open() without O_NONBLOCK, and then gzdopen() with the
-// resulting file descriptor and 'N' in the mode, which will set it to non-
-// blocking.
-//
-//go:linkname Gzdopen C.gzdopen
-func Gzdopen(fd c.Int, mode *c.Char) GzFile
 
 // Associate a gzFile with the file descriptor fd.  File descriptors are
 // obtained from calls like open, dup, creat, pipe or fileno (if the file has
@@ -1164,10 +1087,8 @@ func Gzdopen(fd c.Int, mode *c.Char) GzFile
 // used until the next gz* read, write, seek, or close operation, so gzdopen
 // will not detect if fd is invalid (unless fd is -1).
 //
-// llgo:link GzFile.Gzbuffer C.gzbuffer
-func (self GzFile) Gzbuffer(size c.Uint) c.Int {
-	return 0
-}
+//go:linkname Gzdopen C.gzdopen
+func Gzdopen(fd c.Int, mode *c.Char) GzFile
 
 // Set the internal buffer size used by this library's functions for file to
 // size.  The default buffer size is 8192 bytes.  This function must be called
@@ -1182,8 +1103,8 @@ func (self GzFile) Gzbuffer(size c.Uint) c.Int {
 // gzbuffer() returns 0 on success, or -1 on failure, such as being called
 // too late.
 //
-// llgo:link GzFile.Gzsetparams C.gzsetparams
-func (self GzFile) Gzsetparams(level c.Int, strategy c.Int) c.Int {
+// llgo:link GzFile.Buffer C.gzbuffer
+func (self GzFile) Buffer(size c.Uint) c.Int {
 	return 0
 }
 
@@ -1195,8 +1116,8 @@ func (self GzFile) Gzsetparams(level c.Int, strategy c.Int) c.Int {
 // opened for writing, Z_ERRNO if there is an error writing the flushed data,
 // or Z_MEM_ERROR if there is a memory allocation error.
 //
-// llgo:link GzFile.Gzread C.gzread
-func (self GzFile) Gzread(buf Voidp, len c.Uint) c.Int {
+// llgo:link GzFile.Setparams C.gzsetparams
+func (self GzFile) Setparams(level c.Int, strategy c.Int) c.Int {
 	return 0
 }
 
@@ -1233,8 +1154,8 @@ func (self GzFile) Gzread(buf Voidp, len c.Uint) c.Int {
 // Z_STREAM_ERROR. If some data was read before an error, then that data is
 // returned until exhausted, after which the next call will signal the error.
 //
-// llgo:link Voidp.Gzfread C.gzfread
-func (self Voidp) Gzfread(size SizeT, nitems SizeT, file GzFile) SizeT {
+// llgo:link GzFile.Read C.gzread
+func (self GzFile) Read(buf Voidp, len c.Uint) c.Int {
 	return 0
 }
 
@@ -1261,10 +1182,8 @@ func (self Voidp) Gzfread(size SizeT, nitems SizeT, file GzFile) SizeT {
 // written file or a non-blocking file. In that case, use size == 1 or gzread()
 // instead.
 //
-// llgo:link GzFile.Gzwrite C.gzwrite
-func (self GzFile) Gzwrite(buf Voidpc, len c.Uint) c.Int {
-	return 0
-}
+//go:linkname Gzfread C.gzfread
+func Gzfread(buf Voidp, size SizeT, nitems SizeT, file GzFile) SizeT
 
 // Compress and write the len uncompressed bytes at buf to file. gzwrite
 // returns the number of uncompressed bytes written, or 0 in case of error or
@@ -1273,38 +1192,31 @@ func (self GzFile) Gzwrite(buf Voidpc, len c.Uint) c.Int {
 //
 // If len does not fit in an int, then 0 is returned and nothing is written.
 //
-// llgo:link Voidpc.Gzfwrite C.gzfwrite
-func (self Voidpc) Gzfwrite(size SizeT, nitems SizeT, file GzFile) SizeT {
+// llgo:link GzFile.Write C.gzwrite
+func (self GzFile) Write(buf Voidpc, len c.Uint) c.Int {
 	return 0
 }
 
-// llgo:link GzFile.Gzprintf C.gzprintf
-func (self GzFile) Gzprintf(format *c.Char, __llgo_va_list ...any) c.Int {
-	return 0
-}
+// Compress and write nitems items of size size from buf to file, duplicating
+// the interface of stdio's fwrite(), with size_t request and return types.  If
+// the library defines size_t, then z_size_t is identical to size_t.  If not,
+// then z_size_t is an unsigned integer type that can contain a pointer.
+//
+// gzfwrite() returns the number of full items written of size size, or zero
+// if there was an error.  If the multiplication of size and nitems overflows,
+// i.e. the product does not fit in a z_size_t, then nothing is written, zero
+// is returned, and the error state is set to Z_STREAM_ERROR.
+//
+// If writing a concurrently read file or a non-blocking file with size != 1,
+// a partial item could be written, with no way of knowing how much of it was
+// not written, resulting in data loss.  In that case, use size == 1 or
+// gzwrite() instead.
+//
+//go:linkname Gzfwrite C.gzfwrite
+func Gzfwrite(buf Voidpc, size SizeT, nitems SizeT, file GzFile) SizeT
 
-// Convert, format, compress, and write the arguments (...) to file under
-// control of the string format, as in fprintf.  gzprintf returns the number of
-// uncompressed bytes actually written, or a negative zlib error code in case
-// of error.  The number of uncompressed bytes written is limited to 8191, or
-// one less than the buffer size given to gzbuffer().  The caller should assure
-// that this limit is not exceeded.  If it is exceeded, then gzprintf() will
-// return an error (0) with nothing written.
-//
-// In that last case, there may also be a buffer overflow with unpredictable
-// consequences, which is possible only if zlib was compiled with the insecure
-// functions sprintf() or vsprintf(), because the secure snprintf() and
-// vsnprintf() functions were not available. That would only be the case for
-// a non-ANSI C compiler. zlib may have been built without gzprintf() because
-// secure functions were not available and having gzprintf() be insecure was
-// not an option, in which case, gzprintf() returns Z_STREAM_ERROR. All of
-// these possibilities can be determined using zlibCompileFlags().
-//
-// If a Z_BUF_ERROR is returned, then nothing was written due to a stall on
-// the non-blocking write destination.
-//
-// llgo:link GzFile.Gzputs C.gzputs
-func (self GzFile) Gzputs(s *c.Char) c.Int {
+// llgo:link GzFile.Printf C.gzprintf
+func (self GzFile) Printf(format *c.Char, __llgo_va_list ...any) c.Int {
 	return 0
 }
 
@@ -1318,9 +1230,9 @@ func (self GzFile) Gzputs(s *c.Char) c.Int {
 // If the length of the string does not fit in an int, then -1 is returned
 // and nothing is written.
 //
-// llgo:link GzFile.Gzgets C.gzgets
-func (self GzFile) Gzgets(buf *c.Char, len c.Int) *c.Char {
-	return nil
+// llgo:link GzFile.Puts C.gzputs
+func (self GzFile) Puts(s *c.Char) c.Int {
+	return 0
 }
 
 // Read and decompress bytes from file into buf, until len-1 characters are
@@ -1339,16 +1251,16 @@ func (self GzFile) Gzgets(buf *c.Char, len c.Int) *c.Char {
 // blocking device, both as for gzread(). However lines may be broken in the
 // middle, leaving it up to the application to reassemble them as needed.
 //
-// llgo:link GzFile.Gzputc C.gzputc
-func (self GzFile) Gzputc(c c.Int) c.Int {
-	return 0
+// llgo:link GzFile.Gets C.gzgets
+func (self GzFile) Gets(buf *c.Char, len c.Int) *c.Char {
+	return nil
 }
 
 // Compress and write c, converted to an unsigned char, into file.  gzputc
 // returns the value that was written, or -1 in case of error.
 //
-// llgo:link GzFile.Gzgetc C.gzgetc
-func (self GzFile) Gzgetc() c.Int {
+// llgo:link GzFile.Putc C.gzputc
+func (self GzFile) Putc(c c.Int) c.Int {
 	return 0
 }
 
@@ -1366,8 +1278,10 @@ func (self GzFile) Gzgetc() c.Int {
 // return -1, and errno will be EAGAIN or EWOULDBLOCK. gzread() can then be
 // called again.
 //
-//go:linkname Gzungetc C.gzungetc
-func Gzungetc(c c.Int, file GzFile) c.Int
+// llgo:link GzFile.Getc C.gzgetc
+func (self GzFile) Getc() c.Int {
+	return 0
+}
 
 // Push c back onto the stream for file to be read as the first character on
 // the next read.  At least one character of push-back is always allowed.
@@ -1383,45 +1297,32 @@ func Gzungetc(c c.Int, file GzFile) c.Int
 // This can be used to determine the number of uncompressed bytes in a gzip
 // file without having to read it into a buffer.
 //
-// llgo:link GzFile.Gzflush C.gzflush
-func (self GzFile) Gzflush(flush c.Int) c.Int {
+//go:linkname Gzungetc C.gzungetc
+func Gzungetc(c c.Int, file GzFile) c.Int
+
+// Flush all pending output to file.  The parameter flush is as in the
+// deflate() function.  The return value is the zlib error number (see function
+// gzerror below).  gzflush is only permitted when writing.
+//
+// If the flush parameter is Z_FINISH, the remaining data is written and the
+// gzip stream is completed in the output.  If gzwrite() is called again, a new
+// gzip stream will be started in the output.  gzread() is able to read such
+// concatenated gzip streams.
+//
+// gzflush should be called only when strictly necessary because it will
+// degrade compression if called too often.
+//
+// llgo:link GzFile.Flush C.gzflush
+func (self GzFile) Flush(flush c.Int) c.Int {
 	return 0
 }
 
-// ZEXTERN z_off_t ZEXPORT gzseek(gzFile file,
-// z_off_t offset, int whence);
+// Rewind file. This function is supported only for reading.
 //
-// Set the starting position to offset relative to whence for the next gzread
-// or gzwrite on file.  The offset represents a number of bytes in the
-// uncompressed data stream.  The whence parameter is defined as in lseek(2);
-// the value SEEK_END is not supported.
+// gzrewind(file) is equivalent to (int)gzseek(file, 0L, SEEK_SET).
 //
-// If the file is opened for reading, this function is emulated but can be
-// extremely slow.  If the file is opened for writing, only forward seeks are
-// supported; gzseek then compresses a sequence of zeroes up to the new
-// starting position. For reading or writing, any actual seeking is deferred
-// until the next read or write operation, or close operation when writing.
-//
-// gzseek returns the resulting offset location as measured in bytes from
-// the beginning of the uncompressed stream, or -1 in case of error, in
-// particular if the file is opened for writing and the new starting position
-// would be before the current position.
-//
-// llgo:link GzFile.Gzrewind C.gzrewind
-func (self GzFile) Gzrewind() c.Int {
-	return 0
-}
-
-// ZEXTERN z_off_t ZEXPORT gzoffset(gzFile file);
-//
-// Return the current compressed (actual) read or write offset of file.  This
-// offset includes the count of bytes that precede the gzip stream, for example
-// when appending or when using gzdopen() for reading.  When reading, the
-// offset does not include as yet unused buffered input.  This information can
-// be used for a progress indicator.  On error, gzoffset() returns -1.
-//
-// llgo:link GzFile.Gzeof C.gzeof
-func (self GzFile) Gzeof() c.Int {
+// llgo:link GzFile.Rewind C.gzrewind
+func (self GzFile) Rewind() c.Int {
 	return 0
 }
 
@@ -1437,8 +1338,8 @@ func (self GzFile) Gzeof() c.Int {
 // unless the end-of-file indicator is reset by gzclearerr() and the input file
 // has grown since the previous end of file was detected.
 //
-// llgo:link GzFile.Gzdirect C.gzdirect
-func (self GzFile) Gzdirect() c.Int {
+// llgo:link GzFile.Eof C.gzeof
+func (self GzFile) Eof() c.Int {
 	return 0
 }
 
@@ -1463,8 +1364,8 @@ func (self GzFile) Gzdirect() c.Int {
 // linking statically, using gzdirect() will include all of the zlib code for
 // gzip file reading and decompression, which may not be desired.)
 //
-// llgo:link GzFile.Gzclose C.gzclose
-func (self GzFile) Gzclose() c.Int {
+// llgo:link GzFile.Direct C.gzdirect
+func (self GzFile) Direct() c.Int {
 	return 0
 }
 
@@ -1478,13 +1379,13 @@ func (self GzFile) Gzclose() c.Int {
 // file operation error, Z_MEM_ERROR if out of memory, Z_BUF_ERROR if the
 // last read ended in the middle of a gzip stream, or Z_OK on success.
 //
-// llgo:link GzFile.GzcloseR C.gzclose_r
-func (self GzFile) GzcloseR() c.Int {
+// llgo:link GzFile.Close C.gzclose
+func (self GzFile) Close() c.Int {
 	return 0
 }
 
-// llgo:link GzFile.GzcloseW C.gzclose_w
-func (self GzFile) GzcloseW() c.Int {
+// llgo:link GzFile.CloseR C.gzclose_r
+func (self GzFile) CloseR() c.Int {
 	return 0
 }
 
@@ -1496,9 +1397,9 @@ func (self GzFile) GzcloseW() c.Int {
 // decompression code will be included the application when linking to a static
 // zlib library.
 //
-// llgo:link GzFile.Gzerror C.gzerror
-func (self GzFile) Gzerror(errnum *c.Int) *c.Char {
-	return nil
+// llgo:link GzFile.CloseW C.gzclose_w
+func (self GzFile) CloseW() c.Int {
+	return 0
 }
 
 // Return the error message for the last error which occurred on file.
@@ -1515,16 +1416,18 @@ func (self GzFile) Gzerror(errnum *c.Int) *c.Char {
 // gzerror() should be used to distinguish errors from end-of-file for those
 // functions above that do not distinguish those cases in their return values.
 //
-// llgo:link GzFile.Gzclearerr C.gzclearerr
-func (self GzFile) Gzclearerr() {
+// llgo:link GzFile.Error C.gzerror
+func (self GzFile) Error(errnum *c.Int) *c.Char {
+	return nil
 }
 
-// These functions are not related to compression but are exported
-// anyway because they might be useful in applications using the compression
-// library.
+// Clear the error and end-of-file flags for file.  This is analogous to the
+// clearerr() function in stdio.  This is useful for continuing to read a gzip
+// file that is being written concurrently.
 //
-//go:linkname Adler32 C.adler32
-func Adler32(adler ULong, buf *Bytef, len UInt) ULong
+// llgo:link GzFile.Clearerr C.gzclearerr
+func (self GzFile) Clearerr() {
+}
 
 // Update a running Adler-32 checksum with the bytes buf[0..len-1] and
 // return the updated checksum. An Adler-32 value is in the range of a 32-bit
@@ -1543,21 +1446,14 @@ func Adler32(adler ULong, buf *Bytef, len UInt) ULong
 // }
 // if (adler != original_adler) error();
 //
+//go:linkname Adler32 C.adler32
+func Adler32(adler ULong, buf *Bytef, len UInt) ULong
+
+// Same as adler32(), but with a size_t length.  Note that a long is 32 bits
+// on Windows.
+//
 //go:linkname Adler32Z C.adler32_z
 func Adler32Z(adler ULong, buf *Bytef, len SizeT) ULong
-
-// ZEXTERN uLong ZEXPORT adler32_combine(uLong adler1, uLong adler2,
-// z_off_t len2);
-//
-// Combine two Adler-32 checksums into one.  For two sequences of bytes, seq1
-// and seq2 with lengths len1 and len2, Adler-32 checksums were calculated for
-// each, adler1 and adler2.  adler32_combine() returns the Adler-32 checksum of
-// seq1 and seq2 concatenated, requiring only adler1, adler2, and len2.  Note
-// that the z_off_t type (like off_t) is a signed integer.  If len2 is
-// negative, the result has no meaning or utility.
-//
-//go:linkname Crc32 C.crc32
-func Crc32(crc ULong, buf *Bytef, len UInt) ULong
 
 // Update a running CRC-32 with the bytes buf[0..len-1] and return the
 // updated CRC-32. A CRC-32 value is in the range of a 32-bit unsigned integer.
@@ -1574,13 +1470,18 @@ func Crc32(crc ULong, buf *Bytef, len UInt) ULong
 // }
 // if (crc != original_crc) error();
 //
+//go:linkname Crc32 C.crc32
+func Crc32(crc ULong, buf *Bytef, len UInt) ULong
+
+// Same as crc32(), but with a size_t length.  Note that a long is 32 bits on
+// Windows.
+//
 //go:linkname Crc32Z C.crc32_z
 func Crc32Z(crc ULong, buf *Bytef, len SizeT) ULong
 
-// ZEXTERN uLong ZEXPORT crc32_combine_gen(z_off_t len2);
-//
-// Return the operator corresponding to length len2, to be used with
-// crc32_combine_op(). len2 must be non-negative, otherwise zero is returned.
+// Give the same result as crc32_combine(), using op in place of len2. op is
+// is generated from len2 by crc32_combine_gen(). This will be faster than
+// crc32_combine() if the generated op is used more than once.
 //
 //go:linkname Crc32CombineOp C.crc32_combine_op
 func Crc32CombineOp(crc1 ULong, crc2 ULong, op ULong) ULong
@@ -1588,41 +1489,53 @@ func Crc32CombineOp(crc1 ULong, crc2 ULong, op ULong) ULong
 // deflateInit and inflateInit are macros to allow checking the zlib version
 // and the compiler's view of z_stream:
 //
-//go:linkname DeflateInit_ C.deflateInit_
-func DeflateInit_(strm Streamp, level c.Int, version *c.Char, stream_size c.Int) c.Int
+// llgo:link Streamp.DeflateInit_ C.deflateInit_
+func (self Streamp) DeflateInit_(level c.Int, version *c.Char, stream_size c.Int) c.Int {
+	return 0
+}
 
-//go:linkname InflateInit_ C.inflateInit_
-func InflateInit_(strm Streamp, version *c.Char, stream_size c.Int) c.Int
+// llgo:link Streamp.InflateInit_ C.inflateInit_
+func (self Streamp) InflateInit_(version *c.Char, stream_size c.Int) c.Int {
+	return 0
+}
 
-//go:linkname DeflateInit2_ C.deflateInit2_
-func DeflateInit2_(strm Streamp, level c.Int, method c.Int, windowBits c.Int, memLevel c.Int, strategy c.Int, version *c.Char, stream_size c.Int) c.Int
+// llgo:link Streamp.DeflateInit2_ C.deflateInit2_
+func (self Streamp) DeflateInit2_(level c.Int, method c.Int, windowBits c.Int, memLevel c.Int, strategy c.Int, version *c.Char, stream_size c.Int) c.Int {
+	return 0
+}
 
-//go:linkname InflateInit2_ C.inflateInit2_
-func InflateInit2_(strm Streamp, windowBits c.Int, version *c.Char, stream_size c.Int) c.Int
+// llgo:link Streamp.InflateInit2_ C.inflateInit2_
+func (self Streamp) InflateInit2_(windowBits c.Int, version *c.Char, stream_size c.Int) c.Int {
+	return 0
+}
 
-//go:linkname InflateBackInit_ C.inflateBackInit_
-func InflateBackInit_(strm Streamp, windowBits c.Int, window *uint8, version *c.Char, stream_size c.Int) c.Int
+// llgo:link Streamp.InflateBackInit_ C.inflateBackInit_
+func (self Streamp) InflateBackInit_(windowBits c.Int, window *uint8, version *c.Char, stream_size c.Int) c.Int {
+	return 0
+}
 
-// llgo:link GzFile.Gzgetc_ C.gzgetc_
-func (self GzFile) Gzgetc_() c.Int {
+// backward compatibility
+//
+// llgo:link GzFile.Getc_ C.gzgetc_
+func (self GzFile) Getc_() c.Int {
 	return 0
 }
 
 //go:linkname Gzopen C.gzopen
 func Gzopen(_llcppg_param1 *c.Char, _llcppg_param2 *c.Char) GzFile
 
-// llgo:link GzFile.Gzseek C.gzseek
-func (self GzFile) Gzseek(_llcppg_param2 os.OffT, _llcppg_param3 c.Int) os.OffT {
+// llgo:link GzFile.Seek C.gzseek
+func (self GzFile) Seek(_llcppg_param2 os.OffT, _llcppg_param3 c.Int) os.OffT {
 	return 0
 }
 
-// llgo:link GzFile.Gztell C.gztell
-func (self GzFile) Gztell() os.OffT {
+// llgo:link GzFile.Tell C.gztell
+func (self GzFile) Tell() os.OffT {
 	return 0
 }
 
-// llgo:link GzFile.Gzoffset C.gzoffset
-func (self GzFile) Gzoffset() os.OffT {
+// llgo:link GzFile.Offset C.gzoffset
+func (self GzFile) Offset() os.OffT {
 	return 0
 }
 
@@ -1640,28 +1553,40 @@ func Crc32CombineGen(_llcppg_param1 os.OffT) ULong
 //go:linkname ZError C.zError
 func ZError(_llcppg_param1 c.Int) *c.Char
 
-//go:linkname InflateSyncPoint C.inflateSyncPoint
-func InflateSyncPoint(_llcppg_param1 Streamp) c.Int
+// llgo:link Streamp.InflateSyncPoint C.inflateSyncPoint
+func (self Streamp) InflateSyncPoint() c.Int {
+	return 0
+}
 
 //go:linkname GetCrcTable C.get_crc_table
 func GetCrcTable() *CrcT
 
-//go:linkname InflateUndermine C.inflateUndermine
-func InflateUndermine(_llcppg_param1 Streamp, _llcppg_param2 c.Int) c.Int
+// llgo:link Streamp.InflateUndermine C.inflateUndermine
+func (self Streamp) InflateUndermine(_llcppg_param2 c.Int) c.Int {
+	return 0
+}
 
-//go:linkname InflateValidate C.inflateValidate
-func InflateValidate(_llcppg_param1 Streamp, _llcppg_param2 c.Int) c.Int
+// llgo:link Streamp.InflateValidate C.inflateValidate
+func (self Streamp) InflateValidate(_llcppg_param2 c.Int) c.Int {
+	return 0
+}
 
-//go:linkname InflateCodesUsed C.inflateCodesUsed
-func InflateCodesUsed(_llcppg_param1 Streamp) c.Ulong
+// llgo:link Streamp.InflateCodesUsed C.inflateCodesUsed
+func (self Streamp) InflateCodesUsed() c.Ulong {
+	return 0
+}
 
-//go:linkname InflateResetKeep C.inflateResetKeep
-func InflateResetKeep(_llcppg_param1 Streamp) c.Int
+// llgo:link Streamp.InflateResetKeep C.inflateResetKeep
+func (self Streamp) InflateResetKeep() c.Int {
+	return 0
+}
 
-//go:linkname DeflateResetKeep C.deflateResetKeep
-func DeflateResetKeep(_llcppg_param1 Streamp) c.Int
+// llgo:link Streamp.DeflateResetKeep C.deflateResetKeep
+func (self Streamp) DeflateResetKeep() c.Int {
+	return 0
+}
 
-// llgo:link GzFile.Gzvprintf C.gzvprintf
-func (self GzFile) Gzvprintf(format *c.Char, va c.VaList) c.Int {
+// llgo:link GzFile.Vprintf C.gzvprintf
+func (self GzFile) Vprintf(format *c.Char, va c.VaList) c.Int {
 	return 0
 }
