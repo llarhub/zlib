@@ -123,10 +123,10 @@ type GzFileS struct {
 type InternalState struct {
 }
 
-// llgo:type C
+//llgo:cdecl
 type AllocFunc = func(_llcppg_param1 Voidpf, _llcppg_param2 UInt, _llcppg_param3 UInt) Voidpf
 
-// llgo:type C
+//llgo:cdecl
 type FreeFunc = func(_llcppg_param1 Voidpf, _llcppg_param2 Voidpf)
 type Stream = StreamS
 type Streamp = *Stream
@@ -136,10 +136,10 @@ type Streamp = *Stream
 type GzHeader = GzHeaderS
 type GzHeaderp = *GzHeader
 
-// llgo:type C
+//llgo:cdecl
 type InFunc = func(_llcppg_param1 unsafe.Pointer, _llcppg_param2 **uint8) c.Uint
 
-// llgo:type C
+//llgo:cdecl
 type OutFunc = func(_llcppg_param1 unsafe.Pointer, _llcppg_param2 *uint8, _llcppg_param3 c.Uint) c.Int
 
 // semi-opaque gzip file descriptor
