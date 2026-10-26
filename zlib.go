@@ -262,7 +262,7 @@ func Version() *c.Char
 // deflate() can be called again with more input and more output space to
 // continue compressing.
 //
-// llgo:link Streamp.Deflate C.deflate
+//llgo:link Streamp.Deflate C.deflate
 func (self Streamp) Deflate(flush c.Int) c.Int {
 	return 0
 }
@@ -277,7 +277,7 @@ func (self Streamp) Deflate(flush c.Int) c.Int {
 // may be set but then points to a static string (which must not be
 // deallocated).
 //
-// llgo:link Streamp.DeflateEnd C.deflateEnd
+//llgo:link Streamp.DeflateEnd C.deflateEnd
 func (self Streamp) DeflateEnd() c.Int {
 	return 0
 }
@@ -398,7 +398,7 @@ func (self Streamp) DeflateEnd() c.Int {
 // then call inflateSync() to look for a good compression block if a partial
 // recovery of the data is to be attempted.
 //
-// llgo:link Streamp.Inflate C.inflate
+//llgo:link Streamp.Inflate C.inflate
 func (self Streamp) Inflate(flush c.Int) c.Int {
 	return 0
 }
@@ -410,7 +410,7 @@ func (self Streamp) Inflate(flush c.Int) c.Int {
 // inflateEnd returns Z_OK if success, or Z_STREAM_ERROR if the stream state
 // was inconsistent.
 //
-// llgo:link Streamp.InflateEnd C.inflateEnd
+//llgo:link Streamp.InflateEnd C.inflateEnd
 func (self Streamp) InflateEnd() c.Int {
 	return 0
 }
@@ -454,7 +454,7 @@ func (self Streamp) InflateEnd() c.Int {
 // or if not at a block boundary for raw deflate).  deflateSetDictionary does
 // not perform any compression: this will be done by deflate().
 //
-// llgo:link Streamp.DeflateSetDictionary C.deflateSetDictionary
+//llgo:link Streamp.DeflateSetDictionary C.deflateSetDictionary
 func (self Streamp) DeflateSetDictionary(dictionary *Bytef, dictLength UInt) c.Int {
 	return 0
 }
@@ -476,7 +476,7 @@ func (self Streamp) DeflateSetDictionary(dictionary *Bytef, dictLength UInt) c.I
 // deflateGetDictionary returns Z_OK on success, or Z_STREAM_ERROR if the
 // stream state is inconsistent.
 //
-// llgo:link Streamp.DeflateGetDictionary C.deflateGetDictionary
+//llgo:link Streamp.DeflateGetDictionary C.deflateGetDictionary
 func (self Streamp) DeflateGetDictionary(dictionary *Bytef, dictLength *UInt) c.Int {
 	return 0
 }
@@ -506,7 +506,7 @@ func DeflateCopy(dest Streamp, source Streamp) c.Int
 // deflateReset returns Z_OK if success, or Z_STREAM_ERROR if the source
 // stream state was inconsistent (such as zalloc or state being Z_NULL).
 //
-// llgo:link Streamp.DeflateReset C.deflateReset
+//llgo:link Streamp.DeflateReset C.deflateReset
 func (self Streamp) DeflateReset() c.Int {
 	return 0
 }
@@ -544,7 +544,7 @@ func (self Streamp) DeflateReset() c.Int {
 // value of Z_BUF_ERROR is not fatal, in which case deflateParams() can be
 // retried with more output space.
 //
-// llgo:link Streamp.DeflateParams C.deflateParams
+//llgo:link Streamp.DeflateParams C.deflateParams
 func (self Streamp) DeflateParams(level c.Int, strategy c.Int) c.Int {
 	return 0
 }
@@ -559,12 +559,12 @@ func (self Streamp) DeflateParams(level c.Int, strategy c.Int) c.Int {
 // deflateTune() can be called after deflateInit() or deflateInit2(), and
 // returns Z_OK on success, or Z_STREAM_ERROR for an invalid deflate stream.
 //
-// llgo:link Streamp.DeflateTune C.deflateTune
+//llgo:link Streamp.DeflateTune C.deflateTune
 func (self Streamp) DeflateTune(good_length c.Int, max_lazy c.Int, nice_length c.Int, max_chain c.Int) c.Int {
 	return 0
 }
 
-// llgo:link Streamp.DeflateBound C.deflateBound
+//llgo:link Streamp.DeflateBound C.deflateBound
 func (self Streamp) DeflateBound(sourceLen ULong) ULong {
 	return 0
 }
@@ -583,7 +583,7 @@ func (self Streamp) DeflateBound(sourceLen ULong) ULong {
 // delfateBound_z() is the same, but takes and returns a size_t length.  Note
 // that a long is 32 bits on Windows.
 //
-// llgo:link Streamp.DeflateBoundZ C.deflateBound_z
+//llgo:link Streamp.DeflateBoundZ C.deflateBound_z
 func (self Streamp) DeflateBoundZ(sourceLen SizeT) SizeT {
 	return 0
 }
@@ -601,7 +601,7 @@ func (self Streamp) DeflateBoundZ(sourceLen SizeT) SizeT {
 // that case Z_BUF_ERROR is returned and *pending is set to the maximum value
 // of an unsigned.
 //
-// llgo:link Streamp.DeflatePending C.deflatePending
+//llgo:link Streamp.DeflatePending C.deflatePending
 func (self Streamp) DeflatePending(pending *c.Uint, bits *c.Int) c.Int {
 	return 0
 }
@@ -614,7 +614,7 @@ func (self Streamp) DeflatePending(pending *c.Uint, bits *c.Int) c.Int {
 // deflateUsed returns Z_OK if success, or Z_STREAM_ERROR if the source
 // stream state was inconsistent.
 //
-// llgo:link Streamp.DeflateUsed C.deflateUsed
+//llgo:link Streamp.DeflateUsed C.deflateUsed
 func (self Streamp) DeflateUsed(bits *c.Int) c.Int {
 	return 0
 }
@@ -631,7 +631,7 @@ func (self Streamp) DeflateUsed(bits *c.Int) c.Int {
 // room in the internal buffer to insert the bits, or Z_STREAM_ERROR if the
 // source stream state was inconsistent.
 //
-// llgo:link Streamp.DeflatePrime C.deflatePrime
+//llgo:link Streamp.DeflatePrime C.deflatePrime
 func (self Streamp) DeflatePrime(bits c.Int, value c.Int) c.Int {
 	return 0
 }
@@ -657,7 +657,7 @@ func (self Streamp) DeflatePrime(bits c.Int, value c.Int) c.Int {
 // deflateSetHeader returns Z_OK if success, or Z_STREAM_ERROR if the source
 // stream state was inconsistent.
 //
-// llgo:link Streamp.DeflateSetHeader C.deflateSetHeader
+//llgo:link Streamp.DeflateSetHeader C.deflateSetHeader
 func (self Streamp) DeflateSetHeader(head GzHeaderp) c.Int {
 	return 0
 }
@@ -680,7 +680,7 @@ func (self Streamp) DeflateSetHeader(head GzHeaderp) c.Int {
 // perform any decompression: this will be done by subsequent calls of
 // inflate().
 //
-// llgo:link Streamp.InflateSetDictionary C.inflateSetDictionary
+//llgo:link Streamp.InflateSetDictionary C.inflateSetDictionary
 func (self Streamp) InflateSetDictionary(dictionary *Bytef, dictLength UInt) c.Int {
 	return 0
 }
@@ -695,7 +695,7 @@ func (self Streamp) InflateSetDictionary(dictionary *Bytef, dictLength UInt) c.I
 // inflateGetDictionary returns Z_OK on success, or Z_STREAM_ERROR if the
 // stream state is inconsistent.
 //
-// llgo:link Streamp.InflateGetDictionary C.inflateGetDictionary
+//llgo:link Streamp.InflateGetDictionary C.inflateGetDictionary
 func (self Streamp) InflateGetDictionary(dictionary *Bytef, dictLength *UInt) c.Int {
 	return 0
 }
@@ -716,7 +716,7 @@ func (self Streamp) InflateGetDictionary(dictionary *Bytef, dictLength *UInt) c.
 // the application may repeatedly call inflateSync, providing more input each
 // time, until success or end of the input data.
 //
-// llgo:link Streamp.InflateSync C.inflateSync
+//llgo:link Streamp.InflateSync C.inflateSync
 func (self Streamp) InflateSync() c.Int {
 	return 0
 }
@@ -744,7 +744,7 @@ func InflateCopy(dest Streamp, source Streamp) c.Int
 // inflateReset returns Z_OK if success, or Z_STREAM_ERROR if the source
 // stream state was inconsistent (such as zalloc or state being Z_NULL).
 //
-// llgo:link Streamp.InflateReset C.inflateReset
+//llgo:link Streamp.InflateReset C.inflateReset
 func (self Streamp) InflateReset() c.Int {
 	return 0
 }
@@ -759,7 +759,7 @@ func (self Streamp) InflateReset() c.Int {
 // stream state was inconsistent (such as zalloc or state being Z_NULL), or if
 // the windowBits parameter is invalid.
 //
-// llgo:link Streamp.InflateReset2 C.inflateReset2
+//llgo:link Streamp.InflateReset2 C.inflateReset2
 func (self Streamp) InflateReset2(windowBits c.Int) c.Int {
 	return 0
 }
@@ -790,7 +790,7 @@ func (self Streamp) InflateReset2(windowBits c.Int) c.Int {
 // number of bits available for insertion.  inflatePrime does not update
 // data_type with the new number of bits in buffer.
 //
-// llgo:link Streamp.InflatePrime C.inflatePrime
+//llgo:link Streamp.InflatePrime C.inflatePrime
 func (self Streamp) InflatePrime(bits c.Int, value c.Int) c.Int {
 	return 0
 }
@@ -820,7 +820,7 @@ func (self Streamp) InflatePrime(bits c.Int, value c.Int) c.Int {
 // inflateMark returns the value noted above, or -65536 if the provided
 // source stream state was inconsistent.
 //
-// llgo:link Streamp.InflateMark C.inflateMark
+//llgo:link Streamp.InflateMark C.inflateMark
 func (self Streamp) InflateMark() c.Long {
 	return 0
 }
@@ -863,7 +863,7 @@ func (self Streamp) InflateMark() c.Long {
 // inflateGetHeader returns Z_OK if success, or Z_STREAM_ERROR if the source
 // stream state was inconsistent.
 //
-// llgo:link Streamp.InflateGetHeader C.inflateGetHeader
+//llgo:link Streamp.InflateGetHeader C.inflateGetHeader
 func (self Streamp) InflateGetHeader(head GzHeaderp) c.Int {
 	return 0
 }
@@ -933,7 +933,7 @@ func (self Streamp) InflateGetHeader(head GzHeaderp) c.Int {
 // assured to be defined if out() returns non-zero.)  Note that inflateBack()
 // cannot return Z_OK.
 //
-// llgo:link Streamp.InflateBack C.inflateBack
+//llgo:link Streamp.InflateBack C.inflateBack
 func (self Streamp) InflateBack(in InFunc, in_desc unsafe.Pointer, out OutFunc, out_desc unsafe.Pointer) c.Int {
 	return 0
 }
@@ -943,7 +943,7 @@ func (self Streamp) InflateBack(in InFunc, in_desc unsafe.Pointer, out OutFunc, 
 // inflateBackEnd() returns Z_OK on success, or Z_STREAM_ERROR if the stream
 // state was inconsistent.
 //
-// llgo:link Streamp.InflateBackEnd C.inflateBackEnd
+//llgo:link Streamp.InflateBackEnd C.inflateBackEnd
 func (self Streamp) InflateBackEnd() c.Int {
 	return 0
 }
@@ -1103,7 +1103,7 @@ func Gzdopen(fd c.Int, mode *c.Char) GzFile
 // gzbuffer() returns 0 on success, or -1 on failure, such as being called
 // too late.
 //
-// llgo:link GzFile.Buffer C.gzbuffer
+//llgo:link GzFile.Buffer C.gzbuffer
 func (self GzFile) Buffer(size c.Uint) c.Int {
 	return 0
 }
@@ -1116,7 +1116,7 @@ func (self GzFile) Buffer(size c.Uint) c.Int {
 // opened for writing, Z_ERRNO if there is an error writing the flushed data,
 // or Z_MEM_ERROR if there is a memory allocation error.
 //
-// llgo:link GzFile.Setparams C.gzsetparams
+//llgo:link GzFile.Setparams C.gzsetparams
 func (self GzFile) Setparams(level c.Int, strategy c.Int) c.Int {
 	return 0
 }
@@ -1154,7 +1154,7 @@ func (self GzFile) Setparams(level c.Int, strategy c.Int) c.Int {
 // Z_STREAM_ERROR. If some data was read before an error, then that data is
 // returned until exhausted, after which the next call will signal the error.
 //
-// llgo:link GzFile.Read C.gzread
+//llgo:link GzFile.Read C.gzread
 func (self GzFile) Read(buf Voidp, len c.Uint) c.Int {
 	return 0
 }
@@ -1192,7 +1192,7 @@ func Gzfread(buf Voidp, size SizeT, nitems SizeT, file GzFile) SizeT
 //
 // If len does not fit in an int, then 0 is returned and nothing is written.
 //
-// llgo:link GzFile.Write C.gzwrite
+//llgo:link GzFile.Write C.gzwrite
 func (self GzFile) Write(buf Voidpc, len c.Uint) c.Int {
 	return 0
 }
@@ -1215,7 +1215,7 @@ func (self GzFile) Write(buf Voidpc, len c.Uint) c.Int {
 //go:linkname Gzfwrite C.gzfwrite
 func Gzfwrite(buf Voidpc, size SizeT, nitems SizeT, file GzFile) SizeT
 
-// llgo:link GzFile.Printf C.gzprintf
+//llgo:link GzFile.Printf C.gzprintf
 func (self GzFile) Printf(format *c.Char, __llgo_va_list ...any) c.Int {
 	return 0
 }
@@ -1230,7 +1230,7 @@ func (self GzFile) Printf(format *c.Char, __llgo_va_list ...any) c.Int {
 // If the length of the string does not fit in an int, then -1 is returned
 // and nothing is written.
 //
-// llgo:link GzFile.Puts C.gzputs
+//llgo:link GzFile.Puts C.gzputs
 func (self GzFile) Puts(s *c.Char) c.Int {
 	return 0
 }
@@ -1251,7 +1251,7 @@ func (self GzFile) Puts(s *c.Char) c.Int {
 // blocking device, both as for gzread(). However lines may be broken in the
 // middle, leaving it up to the application to reassemble them as needed.
 //
-// llgo:link GzFile.Gets C.gzgets
+//llgo:link GzFile.Gets C.gzgets
 func (self GzFile) Gets(buf *c.Char, len c.Int) *c.Char {
 	return nil
 }
@@ -1259,7 +1259,7 @@ func (self GzFile) Gets(buf *c.Char, len c.Int) *c.Char {
 // Compress and write c, converted to an unsigned char, into file.  gzputc
 // returns the value that was written, or -1 in case of error.
 //
-// llgo:link GzFile.Putc C.gzputc
+//llgo:link GzFile.Putc C.gzputc
 func (self GzFile) Putc(c c.Int) c.Int {
 	return 0
 }
@@ -1278,7 +1278,7 @@ func (self GzFile) Putc(c c.Int) c.Int {
 // return -1, and errno will be EAGAIN or EWOULDBLOCK. gzread() can then be
 // called again.
 //
-// llgo:link GzFile.Getc C.gzgetc
+//llgo:link GzFile.Getc C.gzgetc
 func (self GzFile) Getc() c.Int {
 	return 0
 }
@@ -1312,7 +1312,7 @@ func Gzungetc(c c.Int, file GzFile) c.Int
 // gzflush should be called only when strictly necessary because it will
 // degrade compression if called too often.
 //
-// llgo:link GzFile.Flush C.gzflush
+//llgo:link GzFile.Flush C.gzflush
 func (self GzFile) Flush(flush c.Int) c.Int {
 	return 0
 }
@@ -1321,7 +1321,7 @@ func (self GzFile) Flush(flush c.Int) c.Int {
 //
 // gzrewind(file) is equivalent to (int)gzseek(file, 0L, SEEK_SET).
 //
-// llgo:link GzFile.Rewind C.gzrewind
+//llgo:link GzFile.Rewind C.gzrewind
 func (self GzFile) Rewind() c.Int {
 	return 0
 }
@@ -1338,7 +1338,7 @@ func (self GzFile) Rewind() c.Int {
 // unless the end-of-file indicator is reset by gzclearerr() and the input file
 // has grown since the previous end of file was detected.
 //
-// llgo:link GzFile.Eof C.gzeof
+//llgo:link GzFile.Eof C.gzeof
 func (self GzFile) Eof() c.Int {
 	return 0
 }
@@ -1364,7 +1364,7 @@ func (self GzFile) Eof() c.Int {
 // linking statically, using gzdirect() will include all of the zlib code for
 // gzip file reading and decompression, which may not be desired.)
 //
-// llgo:link GzFile.Direct C.gzdirect
+//llgo:link GzFile.Direct C.gzdirect
 func (self GzFile) Direct() c.Int {
 	return 0
 }
@@ -1379,12 +1379,12 @@ func (self GzFile) Direct() c.Int {
 // file operation error, Z_MEM_ERROR if out of memory, Z_BUF_ERROR if the
 // last read ended in the middle of a gzip stream, or Z_OK on success.
 //
-// llgo:link GzFile.Close C.gzclose
+//llgo:link GzFile.Close C.gzclose
 func (self GzFile) Close() c.Int {
 	return 0
 }
 
-// llgo:link GzFile.CloseR C.gzclose_r
+//llgo:link GzFile.CloseR C.gzclose_r
 func (self GzFile) CloseR() c.Int {
 	return 0
 }
@@ -1397,7 +1397,7 @@ func (self GzFile) CloseR() c.Int {
 // decompression code will be included the application when linking to a static
 // zlib library.
 //
-// llgo:link GzFile.CloseW C.gzclose_w
+//llgo:link GzFile.CloseW C.gzclose_w
 func (self GzFile) CloseW() c.Int {
 	return 0
 }
@@ -1416,7 +1416,7 @@ func (self GzFile) CloseW() c.Int {
 // gzerror() should be used to distinguish errors from end-of-file for those
 // functions above that do not distinguish those cases in their return values.
 //
-// llgo:link GzFile.Error C.gzerror
+//llgo:link GzFile.Error C.gzerror
 func (self GzFile) Error(errnum *c.Int) *c.Char {
 	return nil
 }
@@ -1425,7 +1425,7 @@ func (self GzFile) Error(errnum *c.Int) *c.Char {
 // clearerr() function in stdio.  This is useful for continuing to read a gzip
 // file that is being written concurrently.
 //
-// llgo:link GzFile.Clearerr C.gzclearerr
+//llgo:link GzFile.Clearerr C.gzclearerr
 func (self GzFile) Clearerr() {
 }
 
@@ -1489,34 +1489,34 @@ func Crc32CombineOp(crc1 ULong, crc2 ULong, op ULong) ULong
 // deflateInit and inflateInit are macros to allow checking the zlib version
 // and the compiler's view of z_stream:
 //
-// llgo:link Streamp.DeflateInit_ C.deflateInit_
+//llgo:link Streamp.DeflateInit_ C.deflateInit_
 func (self Streamp) DeflateInit_(level c.Int, version *c.Char, stream_size c.Int) c.Int {
 	return 0
 }
 
-// llgo:link Streamp.InflateInit_ C.inflateInit_
+//llgo:link Streamp.InflateInit_ C.inflateInit_
 func (self Streamp) InflateInit_(version *c.Char, stream_size c.Int) c.Int {
 	return 0
 }
 
-// llgo:link Streamp.DeflateInit2_ C.deflateInit2_
+//llgo:link Streamp.DeflateInit2_ C.deflateInit2_
 func (self Streamp) DeflateInit2_(level c.Int, method c.Int, windowBits c.Int, memLevel c.Int, strategy c.Int, version *c.Char, stream_size c.Int) c.Int {
 	return 0
 }
 
-// llgo:link Streamp.InflateInit2_ C.inflateInit2_
+//llgo:link Streamp.InflateInit2_ C.inflateInit2_
 func (self Streamp) InflateInit2_(windowBits c.Int, version *c.Char, stream_size c.Int) c.Int {
 	return 0
 }
 
-// llgo:link Streamp.InflateBackInit_ C.inflateBackInit_
+//llgo:link Streamp.InflateBackInit_ C.inflateBackInit_
 func (self Streamp) InflateBackInit_(windowBits c.Int, window *uint8, version *c.Char, stream_size c.Int) c.Int {
 	return 0
 }
 
 // backward compatibility
 //
-// llgo:link GzFile.Getc_ C.gzgetc_
+//llgo:link GzFile.Getc_ C.gzgetc_
 func (self GzFile) Getc_() c.Int {
 	return 0
 }
@@ -1524,17 +1524,17 @@ func (self GzFile) Getc_() c.Int {
 //go:linkname Gzopen C.gzopen
 func Gzopen(_llcppg_param1 *c.Char, _llcppg_param2 *c.Char) GzFile
 
-// llgo:link GzFile.Seek C.gzseek
+//llgo:link GzFile.Seek C.gzseek
 func (self GzFile) Seek(_llcppg_param2 os.OffT, _llcppg_param3 c.Int) os.OffT {
 	return 0
 }
 
-// llgo:link GzFile.Tell C.gztell
+//llgo:link GzFile.Tell C.gztell
 func (self GzFile) Tell() os.OffT {
 	return 0
 }
 
-// llgo:link GzFile.Offset C.gzoffset
+//llgo:link GzFile.Offset C.gzoffset
 func (self GzFile) Offset() os.OffT {
 	return 0
 }
@@ -1553,7 +1553,7 @@ func Crc32CombineGen(_llcppg_param1 os.OffT) ULong
 //go:linkname ZError C.zError
 func ZError(_llcppg_param1 c.Int) *c.Char
 
-// llgo:link Streamp.InflateSyncPoint C.inflateSyncPoint
+//llgo:link Streamp.InflateSyncPoint C.inflateSyncPoint
 func (self Streamp) InflateSyncPoint() c.Int {
 	return 0
 }
@@ -1561,32 +1561,32 @@ func (self Streamp) InflateSyncPoint() c.Int {
 //go:linkname GetCrcTable C.get_crc_table
 func GetCrcTable() *CrcT
 
-// llgo:link Streamp.InflateUndermine C.inflateUndermine
+//llgo:link Streamp.InflateUndermine C.inflateUndermine
 func (self Streamp) InflateUndermine(_llcppg_param2 c.Int) c.Int {
 	return 0
 }
 
-// llgo:link Streamp.InflateValidate C.inflateValidate
+//llgo:link Streamp.InflateValidate C.inflateValidate
 func (self Streamp) InflateValidate(_llcppg_param2 c.Int) c.Int {
 	return 0
 }
 
-// llgo:link Streamp.InflateCodesUsed C.inflateCodesUsed
+//llgo:link Streamp.InflateCodesUsed C.inflateCodesUsed
 func (self Streamp) InflateCodesUsed() c.Ulong {
 	return 0
 }
 
-// llgo:link Streamp.InflateResetKeep C.inflateResetKeep
+//llgo:link Streamp.InflateResetKeep C.inflateResetKeep
 func (self Streamp) InflateResetKeep() c.Int {
 	return 0
 }
 
-// llgo:link Streamp.DeflateResetKeep C.deflateResetKeep
+//llgo:link Streamp.DeflateResetKeep C.deflateResetKeep
 func (self Streamp) DeflateResetKeep() c.Int {
 	return 0
 }
 
-// llgo:link GzFile.Vprintf C.gzvprintf
+//llgo:link GzFile.Vprintf C.gzvprintf
 func (self GzFile) Vprintf(format *c.Char, va c.VaList) c.Int {
 	return 0
 }
